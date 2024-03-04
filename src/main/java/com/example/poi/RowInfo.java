@@ -25,12 +25,12 @@ public class RowInfo {
         if("".equals(row.getCell(19).getStringCellValue())) this.defaultValue = "";
     }
 
-    public String printRow() {
+    public String printRowOfCreateQuery() {
         return colName + " " + dataType + " "
                 + setNull + " " + pk + " " + defaultValue + " " + comment + ",";
     }
 
-    public String printLastRow() {
+    public String printLastRowOfCreateQuery() {
         return colName + " " + dataType + " "
                 + setNull + " " + pk + " " + defaultValue + " " + comment;
     }

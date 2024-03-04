@@ -23,7 +23,6 @@ public class ExcelUtility {
     static String exportDirPath = DEF_OUT_DIR_PATH;
     static int isReaded = 0;
     ExcelUtility() {
-
     }
 
     public static void readExcel() {
@@ -40,7 +39,7 @@ public class ExcelUtility {
 
             int rowLength = sheet.getPhysicalNumberOfRows(); // 행 개수
 
-            for (int i = 2; i < rowLength; i++) {
+            for (int i = 3; i < rowLength; i++) {
                 Row row = sheet.getRow(i);
                 RowInfo rowInfo = new RowInfo(row);
                 allRows.add(rowInfo);
@@ -57,26 +56,46 @@ public class ExcelUtility {
         }
     }
 
-    public static void writeAllCreateQuery(BufferedWriter writer) throws IOException {
+    private static void writeEachCreateQuery(TableInfo table) {
+        String fileName = table.engTbNm;
+        String fileExtension = ".txt";
+        String dirPath = exportDirPath;
+        String filePath = dirPath + fileName + fileExtension;
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath))){
+            String output = table.printCreateQuery();
+            System.out.println(output);
+            bufferedWriter.write(output);
+        } catch (IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void writeAllCreateQuery(BufferedWriter writer) throws IOException {
         if (isReaded == 0) readExcel(importFilePath);
         tables.values().forEach(v -> outputs.append(v.printCreateQuery()));
         System.out.println(outputs.toString());
         writer.write(outputs.toString());
     }
-    public static void printAllCreateQuery(){
+    private static void printAllCreateQuery(){
         if (isReaded == 0) readExcel(importFilePath);
         tables.values().forEach(v -> outputs.append(v.printCreateQuery()));
         System.out.println(outputs);
     }
 
-    public static void exportToTxt() throws IOException {
-        exportToTxt(exportDirPath);
+    public static void exportAllToEachTxt(String inputFilePath, String outDirPath) {
+        if (isReaded == 0) readExcel(inputFilePath);
+        exportDirPath = "".equals(outDirPath) ? DEF_OUT_DIR_PATH : outDirPath ;
+        tables.values().forEach(ExcelUtility::writeEachCreateQuery);
     }
 
-    public static void exportToTxt(String outDirPath) throws IOException {
-        exportToTxt(importFilePath, outDirPath);
+    public static void exportAllToTxt() throws IOException {
+        exportAllToTxt(exportDirPath);
     }
-    public static void exportToTxt(String inputFilePath, String outDirPath) throws IOException {
+
+    public static void exportAllToTxt(String outDirPath) throws IOException {
+        exportAllToTxt(importFilePath, outDirPath);
+    }
+    public static void exportAllToTxt(String inputFilePath, String outDirPath) throws IOException {
         if (isReaded == 0) readExcel(inputFilePath);
         String fileName = UUID.randomUUID().toString();
         String fileExtension = ".txt";
